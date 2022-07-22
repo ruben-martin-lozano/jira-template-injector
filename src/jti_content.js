@@ -193,6 +193,7 @@ function injectDescriptionTemplate (descriptionElement) {
             issueTypeElement = $('#issuetype-field');
 
         if (issueTypeElement !== null && projectElement !== null) {
+            var dialog = document.querySelector('.jira-dialog-core-content');
             var projectKey = parseProjectKey(projectElement);
             var override = 0;
 
@@ -223,7 +224,20 @@ function injectDescriptionTemplate (descriptionElement) {
                 }
             });
 
+            // Hide Dialog while manipulating markup.
+            dialog.style.visibility = "hidden";
+            // Change to "Text Editor" instead Wysiwig Editor.
+            document.querySelector('[data-mode="source"] button').click();
+            // Set the template text to the description field.
             descriptionElement.value = templateText;
+            // Need a setTimeout to prevent random Jira error with Wysiswig visibility.
+            window.setTimeout(function() {
+                // Go back to Wysiwig Editor.
+                document.querySelector('[data-mode="wysiwyg"] button').click();
+                // Restore Dialog visiblity and scroll to Top.
+                dialog.style.visibility = "";
+                dialog.scrollTo(0, 0);
+            }, 1000);
         } else {
             if (issueTypeElement === null) {
                 console.error('*** Error: Element Id "issuetype-field" not found.');
